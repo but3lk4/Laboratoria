@@ -7,28 +7,36 @@ using Laboratoria;
 
 namespace LaboratoriaTests
 {
+    // 1.nowa rezerwacja zaczyna i kończy się przed istniejącą; zwraca pusty string
+    // 2.nowa rezerwacja zaczyna i kończy się w trakcie istniejącej; zwraca referencje
+    // 3.nowa rezerwacja zaczyna i kończy się po istniejącej; zwraca referencje
+    // 4.nowa rezerwacja zaczyna sie w trakcie istniejącej i kończy się po istniejącej; zwraca referencje
+    // 5.nowa rezerwacja zaczyna sie w trakcie istniejącej i kończy się w trakcie istniejącej; zwraca referencje
+    // 6.nowa rezerwacja zaczyna i kończy się po istniejącej; zwraca pusty string
+    // 7.rezerwacja jest odwołana; zwraca pusty string
+    
     [TestFixture]
     public class BookingHelperTests
     {
         private Booking _existingBooking;
         private Mock<IBookingRepository> _repository;
 
-        [SetUp]
+        [SetUp] //inicjalizuje obiekt booking 
         public void SetUp()
         {
             _existingBooking = new Booking { 
                 Id = 2,
-                ArrivalDate = ArriveOn(2018, 1, 15),
-                DepartureDate = DepartOn(2018, 1, 20),
-                Reference = "a"
+                ArrivalDate = ArriveOn(2019, 1, 9),
+                DepartureDate = DepartOn(2019, 1, 14),
+                Reference = "x"
             };
 
-            _repository = new Mock<IBookingRepository>();
+            _repository = new Mock<IBookingRepository>(); // dzięki Moq możemy zaimplementować interfejs IBookingRepository
             _repository.Setup(r => r.GetActiveBookings(1)).Returns(new List<Booking>
             {
                _existingBooking
 
-            }.AsQueryable());
+            }.AsQueryable()); // kiedy przywołujemy metodę GetActiveBookings powinno zwrócić listę bookingów
         }
 
         [Test]
@@ -38,7 +46,7 @@ namespace LaboratoriaTests
             var result = BookingHelper.OverlappingBookingsExist(new Booking
             {
                 Id = 1,
-                ArrivalDate = Before(_existingBooking.ArrivalDate, -5),
+                ArrivalDate = Before(_existingBooking.ArrivalDate, 5),
                 DepartureDate = Before(_existingBooking.ArrivalDate)
 
             }, _repository.Object);
@@ -140,17 +148,18 @@ namespace LaboratoriaTests
 
         }
 
-        private DateTime ArriveOn(int year, int month, int day)
+    
+        private DateTime ArriveOn(int year, int month, int day) // metoda pomocnicza, zwraca obiekt DateTime godzine przyjazdu
         {
             return new DateTime(year, month, day, 14, 0, 0);
         }
-        private DateTime DepartOn(int year, int month, int day)
+        private DateTime DepartOn(int year, int month, int day) // metoda pomocnicza, zwraca obiekt DateTime godzine odjazdu
         {
             return new DateTime(year, month, day, 10, 0, 0);
         }
-        private DateTime Before(DateTime dateTime, int days = 1)
+        private DateTime Before(DateTime dateTime, int days = 1) // metoda pomocnicza, zwraca obiekt DateTime
         {
-            return dateTime.AddDays(-days);
+            return dateTime.AddDays(days);
         }
         private DateTime After(DateTime dateTime, int days = 1)
         {

@@ -10,10 +10,10 @@ namespace Laboratoria
     {
         public static string OverlappingBookingsExist(Booking booking, IBookingRepository repository)
         {
-            if (booking.Status == "Cancelled")
+            if (booking.Status == "Cancelled")  //sprawdzamy czy status Booking = cancelled, jeśli tak zwraca pusty string
                 return string.Empty;
 
-            var bookings = repository.GetActiveBookings(booking.Id);
+            var bookings = repository.GetActiveBookings(booking.Id); // pobiera aktywne rezerwacje
             var overlappingBooking = bookings.FirstOrDefault(
             b =>
             booking.ArrivalDate < b.DepartureDate
@@ -21,7 +21,7 @@ namespace Laboratoria
 
 
             return overlappingBooking == null ? string.Empty
-            : overlappingBooking.Reference;
+            : overlappingBooking.Reference; // zwraca pusty string jeśli nie nachodzą na siebie rezerwacje, w przeciwnym razie zwraca referencje
         }
     }
 

@@ -32,7 +32,7 @@ namespace Laboratoria.Stack
                 return result;
             }
 
-            public T Peek()
+            public T Peek() // sprawdzenie ostatniej wartości na stosie
             {
                 if (_list.Count == 0)
                     throw new InvalidOperationException();
